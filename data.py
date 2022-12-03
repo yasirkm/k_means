@@ -37,7 +37,6 @@ def preprocessed(data, cols):
 
     # Min-Max Scaling
     min_value, max_value = data.min(), data.max()
-    print(min_value, max_value)
     data = (data - min_value) / (max_value - min_value)
 
     # Returning pre-processed data
