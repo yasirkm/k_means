@@ -23,6 +23,8 @@ def preprocessed(data, cols):
         The proprocessing methods include removing datapoint with bad value or outlier in any of the columns
     '''
 
+    data = data[cols]
+
     # Removing non numeric value
     data = data.apply(pd.to_numeric, errors='coerce')
     data = data.dropna()
