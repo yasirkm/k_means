@@ -15,7 +15,7 @@ COLORS = ['cyan', 'pink', 'lime', 'magenta', 'orange', 'yellow', 'red', 'blue', 
 
 def main():
     cluster_num = None
-    while cluster_num is None or cluster_num>len(COLORS):
+    while cluster_num is None or cluster_num>len(COLORS) or cluster_num<1:
         try:
             cluster_num = int(input(f'Number of cluster (max. {len(COLORS)}): '))
         except ValueError:
