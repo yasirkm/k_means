@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 DATA_PATH = Path(__file__).parent/ 'data' / 'water-treatment.preprocessed'
 
 PRINT_ITERATION = True
-PRINT_CLASSIFICATION = False
+PRINT_CLASSIFICATION = True
 COLORS = ['cyan', 'pink', 'lime', 'magenta', 'orange', 'yellow', 'red', 'blue', 'brown', 'purple', 'green']
 
 
@@ -52,31 +52,52 @@ def main():
 
     # Iterating over K-Means list
     for k_means, pair in zip(k_means_list, attribute_pairs):
-        print(F"{f'K-MEANS {pair}':=^40}")
+        print(f"{f' K-MEANS {pair} ':=^180}")
         stable = False
 
         while not stable:
             stable = k_means.iterate()
 
         # Printing centroid movements
+        pad = 25
         if PRINT_ITERATION:
-            print('Iterations:')
             for num, iterations in enumerate(k_means.centroids_at_iter):
-                print(num)
+                print(f'Iteration {num}')
+                print(f"{'cluster':^{pad}}", end='')
+                headers = list(f'axis {x}' for x in range(1, len(k_means.dataset[0].coordinate)+1))
+                for header in headers:
+                    print(f'{header:^{pad}}', end='')
+                print()
+
                 for centroid in iterations:
-                    print(centroid.coordinate, centroid.cluster_id)
+                    print(f'{centroid.cluster_id:^{pad}}', end='')
+                    for axis in centroid.coordinate:
+                        print(f'{axis:^{pad}}', end='')
+                    print()
+                print()
+            print()
             print()
 
         # Printing Clustering result
         if PRINT_CLASSIFICATION:
             print('Classifications: ')
+            headers = list(f'axis {x}' for x in range(1, len(k_means.dataset[0].coordinate)+1))
+            for header in headers:
+                print(f'{header:^{pad}}', end='')
+            print(f"{'cluster':^{pad}}", end='')
+            print()
+
             for datapoint in k_means.dataset:
-                print(datapoint.coordinate, datapoint.classification)
+                for axis in datapoint.coordinate:
+                    print(f'{axis:^{pad}}', end='')
+                print(f"{datapoint.classification:^{pad}}", end='')
+                print()
+            print()
             print()
 
     # Initialize figure
     fig, axs = plt.subplots(2,2)
-    fig.suptitle('K_Means')
+    fig.suptitle(f'K-Means with {cluster_num} cluster(s)')
 
     # Create groups based on clustering
     subplots = [subplot for row in axs for subplot in row]
@@ -91,6 +112,8 @@ def main():
         for (cluster, coordinates), color in zip(cluster_groups.items(), COLORS):
             x_coords, y_coords = tuple(zip(*coordinates)) # Transpose
             subplot.scatter(x_coords, y_coords, color=color, alpha=0.2, label=cluster)
+
+        subplot.legend()
         
     plt.show()
 
