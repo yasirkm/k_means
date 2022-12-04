@@ -4,23 +4,35 @@ import random
 from pathlib import Path
 from math import sqrt
 
+import matplotlib.pyplot as plt
+
 DATA_PATH = Path(__file__).parent/ 'data' / 'water-treatment.preprocessed'
-CLUSTER_NUM = 2
-ITERATION = 4
+
+PRINT_ITERATION = True
+PRINT_CLASSIFICATION = False
+COLORS = ['cyan', 'pink', 'lime', 'magenta', 'orange', 'yellow', 'red', 'blue', 'brown', 'purple', 'green']
+
 
 def main():
+    cluster_num = None
+    while cluster_num is None or cluster_num>len(COLORS):
+        try:
+            cluster_num = int(input(f'Number of cluster (max. {len(COLORS)}): '))
+        except ValueError:
+            print('The number you typed is invalid')
+
+
     # Loading data
     with open(DATA_PATH, 'r', newline='') as file:
         reader = csv.reader(file)
         cols = tuple(next(reader))
-        # print(cols)
         used_idx = {col_name:cols.index(col_name) for col_name in cols}
 
+        # Casting dataset values to float
         dataset = []
         for row in reader:
             dataset.append(list(map(float, row)))
 
-        print(dataset)
 
     # Initializing attribute pairs (plant input and output)
     attribute_pairs = tuple(zip(cols[::2], cols[1::2]))
@@ -32,8 +44,11 @@ def main():
         col_y = tuple(zip(*dataset))[used_idx[y]]
         datapoints = list(Datapoint(coordinate, None) for coordinate in zip(col_x, col_y))
 
-        centroids = list(Centroid(datapoint.coordinate, id) for id, datapoint in enumerate(random.sample(datapoints, CLUSTER_NUM)))
+        unique_coordinates = set(datapoint.coordinate for datapoint in datapoints)
+
+        centroids = list(Centroid(coordinate, id) for id, coordinate in enumerate(random.sample(unique_coordinates, cluster_num)))
         k_means_list.append(K_Means(datapoints, centroids))
+
 
     # Iterating over K-Means list
     for k_means, pair in zip(k_means_list, attribute_pairs):
@@ -44,19 +59,40 @@ def main():
             stable = k_means.iterate()
 
         # Printing centroid movements
-        print('Iterations:')
-        for num, iterations in enumerate(k_means.centroids_at_iter):
-            print(num)
-            for centroid in iterations:
-                print(centroid.coordinate, centroid.cluster_id)
-        print()
+        if PRINT_ITERATION:
+            print('Iterations:')
+            for num, iterations in enumerate(k_means.centroids_at_iter):
+                print(num)
+                for centroid in iterations:
+                    print(centroid.coordinate, centroid.cluster_id)
+            print()
 
         # Printing Clustering result
-        print('Classifications: ')
-        for datapoint in k_means.dataset:
-            print(datapoint.coordinate, datapoint.classification)
+        if PRINT_CLASSIFICATION:
+            print('Classifications: ')
+            for datapoint in k_means.dataset:
+                print(datapoint.coordinate, datapoint.classification)
+            print()
 
+    # Initialize figure
+    fig, axs = plt.subplots(2,2)
+    fig.suptitle('K_Means')
+
+    # Create groups based on clustering
+    subplots = [subplot for row in axs for subplot in row]
+    for k_means, pair, subplot in zip(k_means_list, attribute_pairs, subplots):
+        x, y = pair
+        subplot.set_xlabel(x)
+        subplot.set_ylabel(y)
+        cluster_groups = {centroid.cluster_id:[] for centroid in k_means.centroids_at_iter[-1]}
+        for datapoint in k_means.dataset:
+            cluster_groups[datapoint.classification].append(datapoint.coordinate)
         
+        for (cluster, coordinates), color in zip(cluster_groups.items(), COLORS):
+            x_coords, y_coords = tuple(zip(*coordinates)) # Transpose
+            subplot.scatter(x_coords, y_coords, color=color, alpha=0.2, label=cluster)
+        
+    plt.show()
 
 class Datapoint:
     def __init__(self, coordinate, classification):
@@ -80,7 +116,6 @@ class K_Means:
 
 
     def iterate(self):
-        changed = False
         # Initialize list of members for each centroid
         centroids_members = {centroid.cluster_id:[] for centroid in self.centroids_at_iter[0]}
 
