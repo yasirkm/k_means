@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 DATA_PATH = Path(__file__).parent / 'data' / 'water-treatment.complete'
-USED_COLS = ['Q-E (input flow to plant)', 'SS-E (input suspended solids to plant)', 'SS-S (output suspended solids)', 'SS-P (input suspended solids to primary settler)', 'SS-D (input suspended solids to secondary settler)', 'RD-SS-P (performance input suspended solids to primary settler)', 'RD-SS-G (global performance input suspended solids)']
+USED_COLS = ['SS-E (input suspended solids to plant)', 'SS-S (output suspended solids)', 'SED-E (input sediments to plant)', 'SED-S (output sediments)', 'PH-E (input pH to plant)', 'PH-S (output pH)', 'COND-E (input conductivity to plant)', 'COND-S (output conductivity)', 'DBO-E (input Biological demand of oxygen to plant)', 'DBO-S (output Biological demand of oxygen)', 'DQO-E (input chemical demand of oxygen to plant)', 'DQO-S (output chemical demand of oxygen)']
 
 OUTPUT_PATH = Path(__file__).parent / 'data' / 'water-treatment.preprocessed'
 
@@ -37,7 +37,7 @@ def preprocessed(data, cols):
     condition = ~((data[cols] < (q1 - 1.5 * iqr)) | (data[cols] > (q3 + 1.5 * iqr))).any(axis=1)
     data = data[condition]
 
-    # Min-Max Scaling
+    # NOrmalication with Min-Max Scaling
     min_value, max_value = data.min(), data.max()
     data = (data - min_value) / (max_value - min_value)
 
