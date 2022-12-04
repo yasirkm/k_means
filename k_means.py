@@ -107,7 +107,7 @@ def main():
             print()
 
     # Initialize figure
-    fig, axs = plt.subplots(2,2)
+    fig, axs = plt.subplots(2,3)
     fig.suptitle(f'K-Means with {cluster_num} cluster(s)')
 
     # Create groups based on clustering
