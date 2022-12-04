@@ -12,9 +12,20 @@ def main():
     generate_preprocessed_data(data, USED_COLS)
     
 def generate_preprocessed_data(data, cols):
+    '''
+        Generate preprocessed data from given data.
+        Write preprocessed data to OUTPUT_PATH
+    '''
+    # Before preprocessing
     print(data)
+
+    # Preprocessing
     preprocessed_data = preprocessed(data, USED_COLS)
+
+    # After preprocessing
     print(preprocessed_data)
+
+    # Write preprocessed data to OUTPUT_PATH
     preprocessed_data.to_csv(OUTPUT_PATH, index=False)
 
 def preprocessed(data, cols):
@@ -23,6 +34,7 @@ def preprocessed(data, cols):
         The proprocessing methods include removing datapoint with bad value or outlier in any of the columns
     '''
 
+    # Filter unused columns
     data = data[cols]
 
     # Removing non numeric value
@@ -37,7 +49,7 @@ def preprocessed(data, cols):
     condition = ~((data[cols] < (q1 - 1.5 * iqr)) | (data[cols] > (q3 + 1.5 * iqr))).any(axis=1)
     data = data[condition]
 
-    # NOrmalication with Min-Max Scaling
+    # Normalization with min-max scaling
     min_value, max_value = data.min(), data.max()
     data = (data - min_value) / (max_value - min_value)
 

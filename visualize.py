@@ -1,7 +1,4 @@
-from pathlib import Path
-
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 from data import preprocessed, DATA_PATH, USED_COLS
@@ -18,10 +15,9 @@ def show_graphs(data_path=DATA_PATH, cols=USED_COLS, preprocess=False):
     data = pd.read_csv(data_path)
     if preprocess:
         data = preprocessed(data, cols)
-
     print(data)
     
-    # Separating data to risky and safe date with the use of the Risk column
+    # Creating figure for visualization
     fig, axs = plt.subplots(2,3)
     fig.suptitle("Scatter Plots for Inputs and Outputs of Water-Treatment Plant")
 
