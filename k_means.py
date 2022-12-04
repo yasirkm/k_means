@@ -177,7 +177,7 @@ class K_Means:
         '''
             Instansiate K_Means process object.
             dataset: array-like object for Datapoint class instance(s)
-            centroids: list of Datapoint class instance(s)
+            centroids: list of Centroid class instance(s)
         '''
         self.dataset = dataset
 
